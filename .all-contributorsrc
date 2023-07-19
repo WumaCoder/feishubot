@@ -32,7 +32,7 @@
   "files": ["README.md"],
   "imageSize": 100,
   "projectName": "feishubot",
-  "projectOwner": "WumaCOder",
+  "projectOwner": "WumaCoder",
   "repoHost": "https://github.com",
   "repoType": "github",
   "commitType": "docs"

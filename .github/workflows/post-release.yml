@@ -14,7 +14,7 @@ jobs:
 
             The release is available on:
 
-            * [GitHub releases](https://github.com/WumaCOder/feishubot/releases/tag/{release_tag})
+            * [GitHub releases](https://github.com/WumaCoder/feishubot/releases/tag/{release_tag})
             * [npm package (@latest dist-tag)](https://www.npmjs.com/package/feishubot/v/${{ env.npm_version }})
 
             Cheers! 📦🚀
