@@ -1,6 +1,7 @@
 {
 	"name": "feishubot",
 	"version": "0.0.0",
+	"private": false,
 	"description": "a feishu bot",
 	"repository": {
 		"type": "git",
@@ -81,6 +82,6 @@
 		"node": ">=18"
 	},
 	"publishConfig": {
-		"provenance": true
+		"access": "public"
 	}
 }
