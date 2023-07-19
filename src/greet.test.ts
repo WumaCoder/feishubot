@@ -5,7 +5,7 @@ import { greet } from "./greet.js";
 const message = "Yay, testing!";
 
 describe("greet", () => {
-	it("logs to the console once when message is provided as a string", () => {
+	it("logs to the console once when message is provided as a string2", () => {
 		const logger = vi.spyOn(console, "log").mockImplementation(() => undefined);
 
 		greet(message);
