@@ -8,8 +8,8 @@
 	},
 	"license": "MIT",
 	"author": {
-		"name": "Josh Goldberg",
-		"email": "npm@joshuakgoldberg.com"
+		"name": "WumaCOder",
+		"email": "1829913225@qq.com"
 	},
 	"type": "module",
 	"main": "./lib/index.js",
