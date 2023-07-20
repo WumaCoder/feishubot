@@ -1,6 +1,6 @@
 import * as lark from "@larksuiteoapi/node-sdk";
 
-import { BOT_APPID, BOT_APPSECRET } from "./config";
+import { BOT_APPID, BOT_APPSECRET } from "./config.js";
 
 export const client = new lark.Client({
 	appId: BOT_APPID,

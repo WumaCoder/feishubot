@@ -1,7 +1,7 @@
 import * as commander from "commander";
 
-import interactiveCmd from "./interactive";
-import serveCmd from "./serve";
+import interactiveCmd from "./interactive.js";
+import serveCmd from "./serve.js";
 
 const program = new commander.Command("feishu bot");
 

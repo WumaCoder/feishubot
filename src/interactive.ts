@@ -1,9 +1,9 @@
 import { Command } from "commander";
 import fs from "fs-extra";
 
-import { TEMP_FILE } from "./config";
-import { client } from "./feishuSdk";
-import { createContent, parseBtns } from "./shared";
+import { TEMP_FILE } from "./config.js";
+import { client } from "./feishuSdk.js";
+import { createContent, parseBtns } from "./shared.js";
 
 export default (interactive: Command) => {
 	interactive
