@@ -67,6 +67,32 @@ export default (program: Command) => {
 						});
 
 						await db.write();
+						return {
+							code: 0,
+						};
+					}
+
+					if (cmd === "/getBinds") {
+						await client.im.message.create({
+							data: {
+								content: JSON.stringify({
+									text: `以下是查询结果：\n${db.data.bindGitMembers
+										.map(
+											(item) =>
+												`email: ${item.gitEmail}, feishuUserId: ${item.feishuUserId}`,
+										)
+										.join("\n")}`,
+								}),
+								msg_type: "text",
+								receive_id: body.event.message.chat_id,
+							},
+							params: {
+								receive_id_type: "chat_id",
+							},
+						});
+						return {
+							code: 0,
+						};
 					}
 				}
 
