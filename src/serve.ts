@@ -2,6 +2,7 @@ import { Command } from "commander";
 import Fastify from "fastify";
 
 import db from "./db.js";
+import { client } from "./feishuSdk.js";
 const fastify = Fastify({
 	logger: true,
 });
@@ -26,6 +27,7 @@ export default (program: Command) => {
 				// console.log(args);
 
 				await db.read();
+				// console.log(JSON.stringify(body));
 
 				const [hook, cmd, ...argsv] = [
 					body.header.event_type,
@@ -50,6 +52,19 @@ export default (program: Command) => {
 								gitEmail: temail,
 							});
 						}
+
+						await client.im.message.create({
+							data: {
+								content: JSON.stringify({
+									text: `<at user_id="${body.event.sender.sender_id.open_id}">Tom</at> 绑定成功，你的邮箱是 ${temail}`,
+								}),
+								msg_type: "text",
+								receive_id: body.event.message.chat_id,
+							},
+							params: {
+								receive_id_type: "chat_id",
+							},
+						});
 
 						await db.write();
 					}
