@@ -14,50 +14,45 @@ export default (program: Command) => {
 			fastify.post("/feishubot2", async (request, reply) => {
 				const body: any = request.body;
 
+				if (body.challenge) {
+					return body;
+				}
+
 				const content = JSON.parse(body.event.message.content);
 				// console.log(content);
 				const text = content.text;
 				const args = text.split(" ").filter((item: string) => item);
+
 				// console.log(args);
 
 				await db.read();
 
-				const action = new Command();
-				const data: string[] = [];
-				action.configureOutput({
-					// 此处使输出变得容易区分
-					writeErr: (str) => data.push(`[ERR] ${str}`),
-					writeOut: (str) => data.push(`${str}`),
-				});
-				const im_message_receive_v1 = action.command("im.message.receive_v1");
-				im_message_receive_v1
-					.command("/bind", "绑定git账号")
-					.argument("<string>", "git email")
-					.action(async (email) => {
+				const [hook, cmd, ...argsv] = [
+					body.header.event_type,
+					...args.slice(1),
+				];
+
+				if (hook === "im.message.receive_v1") {
+					if (cmd === "/bind") {
+						const [email] = argsv;
+						const temail = email.match(/\[(.*)\]/)?.[1] ?? email;
+						console.log(email, temail);
+
 						const item = db.data.bindGitMembers.find(
 							(item) =>
 								item.feishuUserId === body.event.sender.sender_id.open_id,
 						);
 						if (item) {
-							item.gitEmail = email;
+							item.gitEmail = temail;
 						} else {
 							db.data.bindGitMembers.push({
 								feishuUserId: body.event.sender.sender_id.open_id,
-								gitEmail: email,
+								gitEmail: temail,
 							});
 						}
 
 						await db.write();
-					});
-				try {
-					action.exitOverride();
-					await action.parseAsync([body.header.event_type, ...args]);
-				} catch (error: any) {
-					return {
-						code: error.exitCode || 2,
-						data: data.join("\n"),
-						msg: String(error?.message),
-					};
+					}
 				}
 
 				reply.send({ code: 0 });
