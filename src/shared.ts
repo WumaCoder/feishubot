@@ -29,7 +29,9 @@ export const createContent = async ({
 				}
 
 				if (text.startsWith("*")) {
-					return ` &#45; ${text.substring(1)} ${await getAtToHash(text)}`;
+					return ` &#45; ${text.substring(1)} ${await getAtToHash(text).catch(
+						() => "",
+					)}`;
 				}
 
 				return text;
