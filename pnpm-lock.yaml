@@ -4,6 +4,9 @@ dependencies:
   '@larksuiteoapi/node-sdk':
     specifier: ^1.19.0
     version: registry.npmjs.org/@larksuiteoapi/node-sdk@1.19.0
+  axios:
+    specifier: ^1.4.0
+    version: registry.npmjs.org/axios@1.4.0
   commander:
     specifier: ^11.0.0
     version: registry.npmjs.org/commander@11.0.0
@@ -16,6 +19,9 @@ dependencies:
   lowdb:
     specifier: ^6.0.1
     version: registry.npmjs.org/lowdb@6.0.1
+  simple-git:
+    specifier: ^3.19.1
+    version: registry.npmjs.org/simple-git@3.19.1
   untildify:
     specifier: ^5.0.0
     version: registry.npmjs.org/untildify@5.0.0
@@ -6656,6 +6662,22 @@ packages:
       fast-json-stringify: registry.npmjs.org/fast-json-stringify@5.7.0
     dev: false
 
+  registry.npmjs.org/@kwsites/file-exists@1.1.1:
+    resolution: {integrity: sha512-m9/5YGR18lIwxSFDwfE3oA7bWuq9kdau6ugN4H2rJeyhFQZcG9AgSHkQtSD15a8WvTgfz9aikZMrKPHvbpqFiw==, registry: https://registry.yarnpkg.com/, tarball: https://registry.npmjs.org/@kwsites/file-exists/-/file-exists-1.1.1.tgz}
+    name: '@kwsites/file-exists'
+    version: 1.1.1
+    dependencies:
+      debug: registry.npmjs.org/debug@4.3.4
+    transitivePeerDependencies:
+      - supports-color
+    dev: false
+
+  registry.npmjs.org/@kwsites/promise-deferred@1.1.1:
+    resolution: {integrity: sha512-GaHYm+c0O9MjZRu0ongGBRbinu8gVAMd2UZjji6jVmqKtZluZnptXGWhz1E8j8D2HJ3f/yMxKAUC0b+57wncIw==, registry: https://registry.yarnpkg.com/, tarball: https://registry.npmjs.org/@kwsites/promise-deferred/-/promise-deferred-1.1.1.tgz}
+    name: '@kwsites/promise-deferred'
+    version: 1.1.1
+    dev: false
+
   registry.npmjs.org/@larksuiteoapi/node-sdk@1.19.0:
     resolution: {integrity: sha512-WjbLej4oiK9mhqX5RcA2/6VKkUuoL+YHamy8WgL6LKzYYfcOWi/oUKFHTotcPq4VlPksp+HT7ZHzXhbvt6nxrA==, registry: https://registry.yarnpkg.com/, tarball: https://registry.npmjs.org/@larksuiteoapi/node-sdk/-/node-sdk-1.19.0.tgz}
     name: '@larksuiteoapi/node-sdk'
@@ -6797,6 +6819,18 @@ packages:
     dependencies:
       follow-redirects: registry.npmjs.org/follow-redirects@1.15.2
       form-data: registry.npmjs.org/form-data@4.0.0
+    transitivePeerDependencies:
+      - debug
+    dev: false
+
+  registry.npmjs.org/axios@1.4.0:
+    resolution: {integrity: sha512-S4XCWMEmzvo64T9GfvQDOXgYRDJ/wsSZc7Jvdgx5u1sd0JwsuPLqb3SYmusag+edF6ziyMensPVqLTSc1PiSEA==, registry: https://registry.yarnpkg.com/, tarball: https://registry.npmjs.org/axios/-/axios-1.4.0.tgz}
+    name: axios
+    version: 1.4.0
+    dependencies:
+      follow-redirects: registry.npmjs.org/follow-redirects@1.15.2
+      form-data: registry.npmjs.org/form-data@4.0.0
+      proxy-from-env: registry.npmjs.org/proxy-from-env@1.1.0
     transitivePeerDependencies:
       - debug
     dev: false
@@ -7259,6 +7293,12 @@ packages:
       ipaddr.js: registry.npmjs.org/ipaddr.js@1.9.1
     dev: false
 
+  registry.npmjs.org/proxy-from-env@1.1.0:
+    resolution: {integrity: sha512-D+zkORCbA9f1tdWRK0RaCR3GPv50cMxcrz4X8k5LTSUD1Dkw47mKJEZQNunItRTkWwgtaUSo1RVFRIG9ZXiFYg==, registry: https://registry.yarnpkg.com/, tarball: https://registry.npmjs.org/proxy-from-env/-/proxy-from-env-1.1.0.tgz}
+    name: proxy-from-env
+    version: 1.1.0
+    dev: false
+
   registry.npmjs.org/punycode@2.1.1:
     resolution: {integrity: sha512-XRsRjdf+j5ml+y/6GKHPZbrF/8p2Yga0JPtdqTIY2Xe5ohJPD9saDJJLPvp9+NSBprVvevdXZybnj2cv8OEd0A==, registry: https://registry.yarnpkg.com/, tarball: https://registry.npmjs.org/punycode/-/punycode-2.1.1.tgz}
     name: punycode
@@ -7360,6 +7400,18 @@ packages:
     resolution: {integrity: sha512-RVnVQxTXuerk653XfuliOxBP81Sf0+qfQE73LIYKcyMYHG94AuH0kgrQpRDuTZnSmjpysHmzxJXKNfa6PjFhyQ==, registry: https://registry.yarnpkg.com/, tarball: https://registry.npmjs.org/set-cookie-parser/-/set-cookie-parser-2.6.0.tgz}
     name: set-cookie-parser
     version: 2.6.0
+    dev: false
+
+  registry.npmjs.org/simple-git@3.19.1:
+    resolution: {integrity: sha512-Ck+rcjVaE1HotraRAS8u/+xgTvToTuoMkT9/l9lvuP5jftwnYUp6DwuJzsKErHgfyRk8IB8pqGHWEbM3tLgV1w==, registry: https://registry.yarnpkg.com/, tarball: https://registry.npmjs.org/simple-git/-/simple-git-3.19.1.tgz}
+    name: simple-git
+    version: 3.19.1
+    dependencies:
+      '@kwsites/file-exists': registry.npmjs.org/@kwsites/file-exists@1.1.1
+      '@kwsites/promise-deferred': registry.npmjs.org/@kwsites/promise-deferred@1.1.1
+      debug: registry.npmjs.org/debug@4.3.4
+    transitivePeerDependencies:
+      - supports-color
     dev: false
 
   registry.npmjs.org/sonic-boom@3.3.0:

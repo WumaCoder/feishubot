@@ -30,7 +30,7 @@ export default (interactive: Command) => {
 				for (const chat of item.items) {
 					const msgOb = await client.im.message.create({
 						data: {
-							content: createContent(opts),
+							content: await createContent(opts),
 							msg_type: "interactive",
 							receive_id: chat.chat_id!,
 						},
@@ -67,7 +67,7 @@ export default (interactive: Command) => {
 			for (const msgId of tempJson.msgIds) {
 				await client.im.message.patch({
 					data: {
-						content: createContent(opts),
+						content: await createContent(opts),
 					},
 					path: {
 						message_id: msgId,

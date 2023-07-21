@@ -1,3 +1,8 @@
+import axios from "axios";
+import { CleanOptions, simpleGit } from "simple-git";
+
+import { BOT_SERVE } from "./config";
+
 export function parseBtns(btns: string[]) {
 	return btns.map((item) => {
 		const [text, value] = item.split(":");
@@ -5,7 +10,7 @@ export function parseBtns(btns: string[]) {
 	});
 }
 
-export const createContent = ({
+export const createContent = async ({
 	template_id,
 	...template_variable
 }: {
@@ -15,6 +20,24 @@ export const createContent = ({
 	template_id: string;
 	title: string;
 }) => {
+	const cs = template_variable.content.split("\n");
+	const content = (
+		await Promise.all(
+			cs.map(async (text) => {
+				if (text.startsWith("###")) {
+					return `**${text.substring(3)}**`;
+				}
+
+				if (text.startsWith("*")) {
+					return ` - ${text.substring(1)} ${await getAtToHash(text)}`;
+				}
+
+				return text;
+			}),
+		)
+	).join("\n");
+	template_variable.content = content;
+
 	return JSON.stringify({
 		data: {
 			template_id,
@@ -23,3 +46,32 @@ export const createContent = ({
 		type: "template",
 	});
 };
+
+// 通过 hash 获取 at
+async function getAtToHash(text: string) {
+	const ats = text.match(/\(\[(\w+)\]\(/);
+	if (!ats) {
+		return "";
+	}
+
+	const hash = ats[1];
+
+	const commit = simpleGit().show(hash).toString();
+
+	const emailMatch = commit.match(/<(.*)>/);
+
+	if (!emailMatch) {
+		return "";
+	}
+
+	const email = emailMatch[1];
+
+	const res = await axios.get(BOT_SERVE + "/feishubot2/db");
+	const bindGitMembers = res.data.bindGitMembers;
+	const item = bindGitMembers.find((item: any) => item.gitEmail === email);
+	if (!item) {
+		return "";
+	}
+
+	return `<at id="${item.feishuUserId}"></at>`;
+}
