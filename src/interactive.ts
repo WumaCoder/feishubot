@@ -14,6 +14,8 @@ export default (interactive: Command) => {
 		.option("--template_id <string>") // template_id
 		.option("--foot_text <string>") // foot_text
 		.option("--btns <string...>") // btns
+		.option("--content_head <string>") // btns
+		.option("--content_foot <string>") // btns
 		.action(async function (opts) {
 			opts.btns = parseBtns(opts.btns);
 			const msgIds = [];
@@ -65,6 +67,8 @@ export default (interactive: Command) => {
 		.option("--template_id <string>") // template_id
 		.option("--foot_text <string>") // foot_text
 		.option("--btns <string...>") // btns
+		.option("--content_head <string>", "") // btns
+		.option("--content_foot <string>", "") // btns
 		.action(async function (opts) {
 			await CliDb.read();
 			const tempJson = CliDb.data;
