@@ -29,7 +29,7 @@ export const createContent = async ({
 				}
 
 				if (text.startsWith("*")) {
-					return ` - ${text.substring(1)} ${await getAtToHash(text)}`;
+					return ` &#45; ${text.substring(1)} ${await getAtToHash(text)}`;
 				}
 
 				return text;
@@ -37,6 +37,18 @@ export const createContent = async ({
 		)
 	).join("\n");
 	template_variable.content = content;
+
+	// const commit = await simpleGit().log();
+
+	// const emailMatch = commit.match(/<(.*)>/);
+
+	// if (!emailMatch) {
+	// 	return "";
+	// }
+
+	// const email = emailMatch[1];
+
+	// const pushAtText = await hashToAt(template_variable.content);
 
 	return JSON.stringify({
 		data: {
@@ -48,7 +60,7 @@ export const createContent = async ({
 };
 
 // 通过 hash 获取 at
-async function getAtToHash(text: string) {
+export async function getAtToHash(text: string) {
 	const ats = text.match(/\(\[(\w+)\]\(/);
 	if (!ats) {
 		return "";
@@ -56,7 +68,11 @@ async function getAtToHash(text: string) {
 
 	const hash = ats[1];
 
-	const commit = simpleGit().show(hash).toString();
+	return await hashToAt(hash);
+}
+
+export async function hashToAt(hash: string) {
+	const commit = await simpleGit().show(hash);
 
 	const emailMatch = commit.match(/<(.*)>/);
 
