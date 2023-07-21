@@ -1,7 +1,7 @@
 import { Command } from "commander";
 import Fastify from "fastify";
 
-import db from "./db.js";
+import { ServeDb as db } from "./db.js";
 import { client } from "./feishuSdk.js";
 const fastify = Fastify({
 	logger: true,

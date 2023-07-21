@@ -1,7 +1,7 @@
 import { Command } from "commander";
 import fs from "fs-extra";
 
-import { TEMP_FILE } from "./config.js";
+import { CliDb } from "./db.js";
 import { client } from "./feishuSdk.js";
 import { createContent, parseBtns } from "./shared.js";
 
@@ -38,12 +38,16 @@ export default (interactive: Command) => {
 							receive_id_type: "chat_id",
 						},
 					});
-					msgIds.push(msgOb.data!.message_id);
+					if (msgOb.data!.message_id) {
+						msgIds.push(msgOb.data!.message_id);
+					}
 				}
 			}
 
-			await fs.ensureFile(TEMP_FILE);
-			await fs.writeFile(TEMP_FILE, JSON.stringify({ msgIds, opts }));
+			await CliDb.read();
+			CliDb.data.msgIds = msgIds;
+			CliDb.data.opts = opts;
+			await CliDb.write();
 		});
 
 	interactive
@@ -55,7 +59,8 @@ export default (interactive: Command) => {
 		.option("--foot_text <string>") // foot_text
 		.option("--btns <string...>") // btns
 		.action(async function (opts) {
-			const tempJson = JSON.parse(fs.readFileSync(TEMP_FILE).toString());
+			await CliDb.read();
+			const tempJson = CliDb.data;
 			opts = Object.assign({}, tempJson.opts, opts);
 			console.log(opts, tempJson);
 
@@ -75,6 +80,8 @@ export default (interactive: Command) => {
 		.command("close")
 		.description("关闭一个消息")
 		.action(async function () {
-			await fs.remove(TEMP_FILE);
+			CliDb.data.msgIds = [];
+			CliDb.data.opts = {};
+			await CliDb.write();
 		});
 };

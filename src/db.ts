@@ -1,17 +1,30 @@
 import { Low } from "lowdb";
 import { JSONFile } from "lowdb/node";
 
-import { DB_FILE } from "./config.js";
+import { CLI_DB_FILE, SERVE_DB_FILE } from "./config.js";
 
-const adapter = new JSONFile<DbData>(DB_FILE);
-const defaultData = { bindGitMembers: [] };
-const db = new Low(adapter, defaultData);
-
-export interface DbData {
+export class ServeDbData {
 	bindGitMembers: {
 		feishuUserId: string;
 		gitEmail: string;
-	}[];
+	}[] = [];
 }
+export const ServeDb = new Low(
+	new JSONFile<ServeDbData>(SERVE_DB_FILE),
+	new ServeDbData(),
+);
 
-export default db;
+export class CliDbData {
+	msgIds: string[] = [];
+	opts: {
+		btns?: { text: string; value: string }[];
+		content?: string;
+		foot_text?: string;
+		template_id?: string;
+		title?: string;
+	} = {};
+}
+export const CliDb = new Low(
+	new JSONFile<CliDbData>(CLI_DB_FILE),
+	new CliDbData(),
+);
