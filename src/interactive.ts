@@ -28,6 +28,13 @@ export default (interactive: Command) => {
 				}
 
 				for (const chat of item.items) {
+					if (
+						chat.description?.includes("--console") &&
+						chat.description.includes("--disabled-push")
+					) {
+						continue;
+					}
+
 					const msgOb = await client.im.message.create({
 						data: {
 							content: await createContent(opts),
