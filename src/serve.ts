@@ -104,7 +104,7 @@ export default (program: Command) => {
 				return db.data;
 			});
 
-			fastify.listen({ port: opts.port }, (err, address) => {
+			fastify.listen({ host: "0.0.0.0", port: opts.port }, (err, address) => {
 				if (err) {
 					throw err;
 				}
