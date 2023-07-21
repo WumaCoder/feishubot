@@ -1,7 +1,7 @@
 import axios from "axios";
 import { CleanOptions, simpleGit } from "simple-git";
 
-import { BOT_SERVE } from "./config";
+import { BOT_SERVE } from "./config.js";
 
 export function parseBtns(btns: string[]) {
 	return btns.map((item) => {
