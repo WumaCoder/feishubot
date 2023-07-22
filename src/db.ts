@@ -15,6 +15,7 @@ export const ServeDb = new Low(
 );
 
 export class CliDbData {
+	loading = -1;
 	msgIds: string[] = [];
 	opts: {
 		btns?: { text: string; value: string }[];

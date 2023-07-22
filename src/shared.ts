@@ -10,16 +10,19 @@ export function parseBtns(btns: string[]) {
 	});
 }
 
-export const createContent = async ({
-	template_id,
-	...template_variable
-}: {
-	btns: any;
-	content: string;
-	foot_text: string;
-	template_id: string;
-	title: string;
-}) => {
+export const createContent = async (
+	{
+		template_id,
+		...template_variable
+	}: {
+		btns: any;
+		content: string;
+		foot_text: string;
+		template_id: string;
+		title: string;
+	},
+	footBefore = "",
+) => {
 	const cs = template_variable.content.split("\n");
 	const content = (
 		await Promise.all(
@@ -39,6 +42,10 @@ export const createContent = async ({
 		)
 	).join("\n");
 	template_variable.content = content;
+
+	if (footBefore) {
+		template_variable.foot_text = footBefore + template_variable.foot_text;
+	}
 
 	// const commit = await simpleGit().log();
 
