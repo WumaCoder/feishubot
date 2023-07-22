@@ -5,7 +5,7 @@ import serveCmd from "./serve.js";
 
 const program = new commander.Command("feishu bot");
 
-program.version("0.0.21");
+program.version("0.0.22");
 
 const interactive = program.command("interactive");
 interactiveCmd(interactive);

@@ -27,6 +27,14 @@ export const createContent = async (
 	const content = (
 		await Promise.all(
 			cs.map(async (text) => {
+				text = await replaceAsync(
+					text,
+					/ @(\w+)/g,
+					async (match: string, p1: string) => {
+						return `${await hashToAt(p1)}`;
+					},
+				);
+
 				if (text.startsWith("###")) {
 					return `**${text.substring(3)}**`;
 				}
@@ -71,16 +79,20 @@ export const createContent = async (
 // 通过 hash 获取 at
 export async function getAtToHash(text: string) {
 	const ats = text.match(/\(\[(\w+)\]\(/);
-	if (!ats) {
-		return "";
+	let hash = "";
+	if (ats) {
+		hash = ats[1];
+	} else {
+		hash = text;
 	}
-
-	const hash = ats[1];
 
 	return await hashToAt(hash);
 }
 
-export async function hashToAt(hash: string) {
+export async function hashToAt(
+	hash: string,
+	atTemp = (id: string) => `<at id="${id}"></at>`,
+) {
 	const commit = await simpleGit().show(hash);
 
 	const emailMatch = commit.match(/<(.*)>/);
@@ -98,5 +110,20 @@ export async function hashToAt(hash: string) {
 		return "";
 	}
 
-	return `<at id="${item.feishuUserId}"></at>`;
+	return atTemp(item.feishuUserId);
+}
+
+export function replaceAsync(
+	str: string,
+	reg: RegExp,
+	cb: (match: string, ...args: any[]) => Promise<string>,
+) {
+	const promises: Promise<string>[] = [];
+	str.replace(reg, (match, ...args) => {
+		promises.push(cb(match, ...args));
+		return match;
+	});
+	return Promise.all(promises).then((replaces) => {
+		return str.replace(reg, () => replaces.shift()!);
+	});
 }
