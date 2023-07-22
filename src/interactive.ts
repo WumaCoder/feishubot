@@ -8,7 +8,7 @@ import { createContent, parseBtns } from "./shared.js";
 const STATUS = {
 	err: "❌",
 	ok: "✅",
-	start: "#",
+	start: "🎈",
 };
 
 export default (interactive: Command) => {
