@@ -2,7 +2,7 @@ import { Command } from "commander";
 
 import { CliDb } from "./db.js";
 import { client } from "./feishuSdk.js";
-import { next } from "./loading";
+import { next } from "./loading.js";
 import { createContent, parseBtns } from "./shared.js";
 
 const STATUS = {
