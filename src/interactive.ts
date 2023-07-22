@@ -81,7 +81,7 @@ export default (interactive: Command) => {
 		const tempJson = CliDb.data;
 		opts = Object.assign({}, tempJson.opts, opts);
 		console.log(opts, tempJson);
-		const status = opts?.status as "err" | "none" | "ok" | "start";
+		const status = opts?.status as "err" | "loading" | "none" | "ok" | "start";
 		if (opts.status === "loading") {
 			CliDb.data.loading++;
 			await CliDb.write();
@@ -94,7 +94,7 @@ export default (interactive: Command) => {
 						opts,
 						status === "none"
 							? ""
-							: (CliDb.data.loading > -1
+							: (status === "loading"
 									? next(CliDb.data.loading)
 									: STATUS[status] || "") + " ",
 					),
