@@ -116,6 +116,7 @@ export default (interactive: Command) => {
 		.option("--btns <string...>") // btns
 		.option("--content_head <string>", "content head") // btns
 		.option("--content_foot <string>", "content foot") // btns
+		.option("--status <string>", "状态, none, start, loading, ok, err", "none")
 		.action(async function (opts) {
 			// 最后调用一次 put
 			await interactivePut(opts);
