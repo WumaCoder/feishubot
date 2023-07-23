@@ -8,3 +8,5 @@ export const BOT_APPID = process.env.BOT_APPID!;
 export const BOT_APPSECRET = process.env.BOT_APPSECRET!;
 export const BOT_SERVE = process.env.BOT_SERVE!;
 export const SERVE_PULL_REPO = process.env.SERVE_PULL_REPO!;
+export const GITEA_REPO = process.env.GITEA_REPO!;
+export const GITEA_TOKEN = process.env.GITEA_TOKEN!;

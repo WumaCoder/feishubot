@@ -1,11 +1,17 @@
 import { execFile, execFileSync } from "child_process";
 import { Command } from "commander";
 import Fastify from "fastify";
+import { existsSync } from "fs";
 import { exists } from "fs-extra";
 import { join } from "path";
 import { simpleGit } from "simple-git";
 
-import { SERVE_PULL_REPO, SERVE_REPO } from "./config.js";
+import {
+	GITEA_REPO,
+	GITEA_TOKEN,
+	SERVE_PULL_REPO,
+	SERVE_REPO,
+} from "./config.js";
 import { ServeDb as db } from "./db.js";
 import { client } from "./feishuSdk.js";
 import { parseVersion } from "./shared.js";
@@ -115,6 +121,11 @@ export default (program: Command) => {
 				await db.read();
 				return db.data;
 			});
+			fastify.post("/feishubot2/codeup", async (request, reply) => {
+				console.log("codeup", request.body);
+				fetchSync();
+				return;
+			});
 
 			fastify.listen({ host: "0.0.0.0", port: opts.port }, (err, address) => {
 				if (err) {
@@ -129,52 +140,48 @@ export default (program: Command) => {
 
 async function overflow_revert(opts: any, version: string, message_id: string) {
 	await Promise.resolve();
-	const cwd = opts.clonePath;
-	console.log(opts, version);
 
-	// execFile("npx", ["gitea-cli", "origin", "pull", cwd, "-r", opts.repo]);
-
-	if (await exists(join(cwd, ".git"))) {
-		const repo = simpleGit(cwd);
-		await repo.checkout("release/pro");
-		await repo.pull();
-		try {
-			await repo.checkoutBranch(`revert/v${version}`, "v" + version);
-		} catch (error) {
-			await repo.checkout(`revert/v${version}`);
-		}
-
-		// 空提交
-		await repo.commit("revert: " + message_id, [], {
-			"--allow-empty": true,
-		} as any);
-
-		const res = await repo.push("origin", `revert/v${version}`, ["-f"]);
-		console.log(res);
-	} else {
-		const res = await simpleGit(cwd)
-			.clone(opts.repo, cwd)
-			.checkout("release/pro")
-			.checkoutBranch(`revert/v${version}`, "v" + version)
-			.commit("revert: " + message_id, [], {
-				"--allow-empty": true,
-			} as any)
-			.push("origin", `revert/v${version}`, ["-f"]);
-		console.log(res);
+	const repo = fetchRepo(opts);
+	await repo.checkout("release/pro");
+	await repo.pull();
+	try {
+		await repo.checkoutBranch(`revert/v${version}`, "v" + version);
+	} catch (error) {
+		await repo.checkout(`revert/v${version}`);
 	}
 
-	// npx gitea-cli sync http://localhost:3000/wumacoder/teacher.git -t c54b63fc071283de5d00f51790a17c11e88e75b8 -o wumacoder -r teacher
+	// 空提交
+	await repo.commit("revert: " + message_id, [], {
+		"--allow-empty": true,
+	} as any);
+
+	const res = await repo.push("origin", `revert/v${version}`, ["-f"]);
+	fetchSync();
+
+	console.log("完成", version);
+}
+
+function fetchRepo(opts: { clonePath: string; repo: string }) {
+	const cwd = opts.clonePath;
+
+	if (existsSync(join(cwd, ".git"))) {
+		return simpleGit(cwd).pull();
+	} else {
+		return simpleGit(cwd).clone(opts.repo, cwd);
+	}
+}
+
+function fetchSync() {
+	const [_, owner, repo] = GITEA_REPO.match(/\/\/.+?\/(.+?)\/(.+?)\./) || [];
 	execFile("npx", [
 		"gitea-cli",
 		"sync",
-		"http://localhost:3000/wumacoder/teacher.git",
+		GITEA_REPO,
 		"-t",
-		"c54b63fc071283de5d00f51790a17c11e88e75b8",
+		GITEA_TOKEN,
 		"-o",
-		"wumacoder",
+		owner,
 		"-r",
-		"teacher",
+		repo,
 	]);
-
-	console.log("完成", version);
 }
