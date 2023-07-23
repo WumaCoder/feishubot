@@ -32,6 +32,7 @@ export default (interactive: Command) => {
 			const msgIds = [];
 			if (opts.message_id) {
 				// 走回复消息模式
+				opts.message_id = opts.message_id.replace(/\n/g, "");
 				const msgOb = await client.im.message.reply({
 					data: {
 						content: await createContent(opts, msg_type),

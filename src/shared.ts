@@ -4,6 +4,10 @@ import { CleanOptions, simpleGit } from "simple-git";
 import { BOT_SERVE } from "./config.js";
 
 export function parseBtns(btns: string[]) {
+	if (!btns) {
+		return [];
+	}
+
 	return btns.map((item) => {
 		const [text, value] = item.split(":");
 		return { text, value };

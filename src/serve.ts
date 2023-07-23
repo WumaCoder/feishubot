@@ -102,7 +102,7 @@ export default (program: Command) => {
 					const option = body.action.option;
 					if (option === "revert") {
 						const title = body?.action?.value?.title as string;
-						overflow_revert(opts, parseVersion(title));
+						overflow_revert(opts, parseVersion(title), body.open_message_id);
 					}
 
 					return;
@@ -127,7 +127,7 @@ export default (program: Command) => {
 		});
 };
 
-async function overflow_revert(opts: any, version: string) {
+async function overflow_revert(opts: any, version: string, message_id: string) {
 	await Promise.resolve();
 	const cwd = opts.clonePath;
 	console.log(opts, version);
@@ -144,6 +144,11 @@ async function overflow_revert(opts: any, version: string) {
 			await repo.checkout(`revert/v${version}`);
 		}
 
+		// 空提交
+		await repo.commit("revert: " + message_id, [], {
+			"--allow-empty": true,
+		} as any);
+
 		const res = await repo.push("origin", `revert/v${version}`, ["-f"]);
 		console.log(res);
 	} else {
@@ -151,6 +156,9 @@ async function overflow_revert(opts: any, version: string) {
 			.clone(opts.repo, cwd)
 			.checkout("release/pro")
 			.checkoutBranch(`revert/v${version}`, "v" + version)
+			.commit("revert: " + message_id, [], {
+				"--allow-empty": true,
+			} as any)
 			.push("origin", `revert/v${version}`, ["-f"]);
 		console.log(res);
 	}
