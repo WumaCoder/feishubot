@@ -21,7 +21,7 @@ export const createContent = async (
 		template_id: string;
 		title: string;
 	},
-	footBefore = "",
+	type: "interactive" | "text" = "interactive",
 ) => {
 	const cs = template_variable.content.split("\n");
 	const content = (
@@ -51,29 +51,22 @@ export const createContent = async (
 	).join("\n");
 	template_variable.content = content;
 
-	if (footBefore) {
-		template_variable.foot_text = footBefore + template_variable.foot_text;
+	if (type === "interactive") {
+		return JSON.stringify({
+			data: {
+				template_id,
+				template_variable,
+			},
+			type: "template",
+		});
+	} else {
+		return JSON.stringify({
+			data: {
+				text: template_variable.content,
+			},
+			msg_type: "text",
+		});
 	}
-
-	// const commit = await simpleGit().log();
-
-	// const emailMatch = commit.match(/<(.*)>/);
-
-	// if (!emailMatch) {
-	// 	return "";
-	// }
-
-	// const email = emailMatch[1];
-
-	// const pushAtText = await hashToAt(template_variable.content);
-
-	return JSON.stringify({
-		data: {
-			template_id,
-			template_variable,
-		},
-		type: "template",
-	});
 };
 
 // 通过 hash 获取 at
@@ -126,4 +119,13 @@ export function replaceAsync(
 	return Promise.all(promises).then((replaces) => {
 		return str.replace(reg, () => replaces.shift()!);
 	});
+}
+
+export function parseVersion(title: string) {
+	const res = title.match(/\d+\.\d+\.\d+/g);
+	if (!res?.[0]) {
+		throw new Error("版本号解析失败");
+	}
+
+	return res[0];
 }

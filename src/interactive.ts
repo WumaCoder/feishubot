@@ -14,7 +14,9 @@ const STATUS = {
 export default (interactive: Command) => {
 	interactive
 		.command("push")
-		.description("发送一个消息")
+		.description("发送或者回复一个消息")
+		.option("--id <string>", "用来区分隔离不同消息会话", "default")
+		.option("--type <string>", "消息类型, interactive | text", "interactive") // title
 		.option("--title <string>") // title
 		.option("--content <string>") // content
 		.option("--template_id <string>") // template_id
@@ -22,51 +24,74 @@ export default (interactive: Command) => {
 		.option("--btns <string...>") // btns
 		.option("--content_head <string>", "content head", "") // btns
 		.option("--content_foot <string>", "content foot", "") // btns
+		.option("--message_id <string>", "要回复的消息ID") // btns
 		.action(async function (opts) {
+			const id = opts.id;
+			const msg_type = opts.type;
 			opts.btns = parseBtns(opts.btns);
 			const msgIds = [];
-			for await (const item of await client.im.chat.listWithIterator({
-				params: {
-					page_size: 20,
-					sort_type: "ByCreateTimeAsc",
-				},
-			})) {
-				if (!item?.items) {
-					continue;
+			if (opts.message_id) {
+				// 走回复消息模式
+				const msgOb = await client.im.message.reply({
+					data: {
+						content: await createContent(opts, msg_type),
+						msg_type,
+					},
+					path: {
+						message_id: opts.message_id,
+					},
+				});
+				if (msgOb.data!.message_id) {
+					msgIds.push(msgOb.data!.message_id);
 				}
-
-				for (const chat of item.items) {
-					if (
-						chat.description?.includes("--console") &&
-						chat.description.includes("--disabled-push")
-					) {
+			} else {
+				for await (const item of await client.im.chat.listWithIterator({
+					params: {
+						page_size: 20,
+						sort_type: "ByCreateTimeAsc",
+					},
+				})) {
+					if (!item?.items) {
 						continue;
 					}
 
-					const msgOb = await client.im.message.create({
-						data: {
-							content: await createContent(opts),
-							msg_type: "interactive",
-							receive_id: chat.chat_id!,
-						},
-						params: {
-							receive_id_type: "chat_id",
-						},
-					});
-					if (msgOb.data!.message_id) {
-						msgIds.push(msgOb.data!.message_id);
+					for (const chat of item.items) {
+						if (
+							chat.description?.includes("--console") &&
+							chat.description.includes("--disabled-push")
+						) {
+							continue;
+						}
+
+						const msgOb = await client.im.message.create({
+							data: {
+								content: await createContent(opts, msg_type),
+								msg_type,
+								receive_id: chat.chat_id!,
+							},
+							params: {
+								receive_id_type: "chat_id",
+							},
+						});
+						if (msgOb.data!.message_id) {
+							msgIds.push(msgOb.data!.message_id);
+						}
 					}
 				}
 			}
 
-			CliDb.data.msgIds = msgIds;
-			CliDb.data.opts = opts;
+			CliDb.data.session[id] = {
+				loading: -1,
+				msgIds,
+				opts,
+			};
 			await CliDb.write();
 		});
 
 	interactive
 		.command("put")
 		.description("更新一个消息")
+		.option("--id <string>", "用来区分隔离不同消息会话", "default")
 		.option("--title <string>") // title
 		.option("--content <string>") // content
 		.option("--template_id <string>") // template_id
@@ -78,26 +103,26 @@ export default (interactive: Command) => {
 		.action(interactivePut);
 	async function interactivePut(opts: any) {
 		await CliDb.read();
-		const tempJson = CliDb.data;
+		const tempJson = CliDb.data.session[opts.id];
 		opts = Object.assign({}, tempJson.opts, opts);
 		console.log(opts, tempJson);
 		const status = opts?.status as "err" | "loading" | "none" | "ok" | "start";
 		if (opts.status === "loading") {
-			CliDb.data.loading++;
+			tempJson.loading++;
 			await CliDb.write();
+		}
+
+		if (status !== "none" && opts.foot_text) {
+			opts.foot_text = `${
+				(status === "loading" ? next(tempJson.loading) : STATUS[status] || "") +
+				" "
+			} ${opts.foot_text}`;
 		}
 
 		for (const msgId of tempJson.msgIds) {
 			await client.im.message.patch({
 				data: {
-					content: await createContent(
-						opts,
-						status === "none"
-							? ""
-							: (status === "loading"
-									? next(CliDb.data.loading)
-									: STATUS[status] || "") + " ",
-					),
+					content: await createContent(opts, opts.type),
 				},
 				path: {
 					message_id: msgId,
@@ -109,6 +134,7 @@ export default (interactive: Command) => {
 	interactive
 		.command("close")
 		.description("关闭一个消息")
+		.option("--id <string>", "用来区分隔离不同消息会话", "default")
 		.option("--title <string>") // title
 		.option("--content <string>") // content
 		.option("--template_id <string>") // template_id
@@ -119,10 +145,9 @@ export default (interactive: Command) => {
 		.option("--status <string>", "状态, none, start, loading, ok, err", "none")
 		.action(async function (opts) {
 			// 最后调用一次 put
+			const id = opts.id;
 			await interactivePut(opts);
-			CliDb.data.msgIds = [];
-			CliDb.data.opts = {};
-			CliDb.data.loading = -1;
+			delete CliDb.data.session[id];
 			await CliDb.write();
 		});
 };

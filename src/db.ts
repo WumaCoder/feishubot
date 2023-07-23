@@ -14,7 +14,7 @@ export const ServeDb = new Low(
 	new ServeDbData(),
 );
 
-export class CliDbData {
+export class MessageSession {
 	loading = -1;
 	msgIds: string[] = [];
 	opts: {
@@ -24,6 +24,9 @@ export class CliDbData {
 		template_id?: string;
 		title?: string;
 	} = {};
+}
+export class CliDbData {
+	session: Record<string, MessageSession> = {};
 }
 export const CliDb = new Low(
 	new JSONFile<CliDbData>(CLI_DB_FILE),

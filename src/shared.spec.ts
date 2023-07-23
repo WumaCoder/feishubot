@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { getAtToHash, replaceAsync } from "./shared.js";
+import { getAtToHash, parseVersion, replaceAsync } from "./shared.js";
 
 describe("shared.ts", () => {
 	// it("getAtToHash", async () => {
@@ -20,5 +20,9 @@ describe("shared.ts", () => {
 				return ` <${p1}>`;
 			}),
 		).toBe(`## hekko <1111>\nfesgsfesf <222> <3333>@xxx`);
+	});
+
+	it("parseVersion", () => {
+		expect(parseVersion("小程序发版 6.1.26 🎉")).toBe("6.1.26");
 	});
 });
