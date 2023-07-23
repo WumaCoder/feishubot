@@ -143,7 +143,7 @@ async function overflow_revert(opts: any, version: string, message_id: string) {
 
 	const repo = fetchRepo(opts);
 	await repo.checkout("release/pro");
-	await repo.pull();
+	await repo.pull("origin", "release/pro");
 	try {
 		await repo.checkoutBranch(`revert/v${version}`, "v" + version);
 	} catch (error) {
@@ -165,7 +165,7 @@ function fetchRepo(opts: { clonePath: string; repo: string }) {
 	const cwd = opts.clonePath;
 
 	if (existsSync(join(cwd, ".git"))) {
-		return simpleGit(cwd).pull();
+		return simpleGit(cwd);
 	} else {
 		return simpleGit(cwd).clone(opts.repo, cwd);
 	}
