@@ -188,6 +188,7 @@ async function button_release(opts: any) {
 
 	await repo.checkout(`release/pro`);
 	await repo.merge([
+		"origin/develop",
 		"--no-ff",
 		"--no-edit",
 		"-m",
