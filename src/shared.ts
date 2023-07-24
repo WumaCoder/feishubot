@@ -55,6 +55,14 @@ export const createContent = async (
 	).join("\n");
 	template_variable.content = content;
 
+	return createParam(type, template_id, template_variable);
+};
+
+export function createParam(
+	type: string,
+	template_id: string,
+	template_variable: any = {},
+) {
 	if (type === "interactive") {
 		return JSON.stringify({
 			data: {
@@ -71,7 +79,7 @@ export const createContent = async (
 			msg_type: "text",
 		});
 	}
-};
+}
 
 // 通过 hash 获取 at
 export async function getAtToHash(text: string) {

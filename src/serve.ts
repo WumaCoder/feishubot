@@ -14,7 +14,7 @@ import {
 } from "./config.js";
 import { ServeDb as db } from "./db.js";
 import { client } from "./feishuSdk.js";
-import { parseVersion } from "./shared.js";
+import { createContent, createParam, parseVersion } from "./shared.js";
 const fastify = Fastify({
 	logger: true,
 });
@@ -80,9 +80,7 @@ export default (program: Command) => {
 						return {
 							code: 0,
 						};
-					}
-
-					if (cmd === "/getBinds") {
+					} else if (cmd === "/getBinds") {
 						await client.im.message.create({
 							data: {
 								content: JSON.stringify({
@@ -103,12 +101,34 @@ export default (program: Command) => {
 						return {
 							code: 0,
 						};
+					} else {
+						const msgOb = await client.im.message.create({
+							data: {
+								content: createParam("interactive", "ctp_AAqkUf5ZjWgh"),
+								msg_type: "interactive",
+								receive_id: body.event.message.chat_id!,
+							},
+							params: {
+								receive_id_type: "chat_id",
+							},
+						});
+						return {
+							code: 0,
+						};
 					}
 				} else if (hook === "overflow") {
 					const option = body.action.option;
 					if (option === "revert") {
 						const title = body?.action?.value?.title as string;
 						overflow_revert(opts, parseVersion(title), body.open_message_id);
+					}
+
+					return;
+				} else if (hook === "button") {
+					const action = body.action.value.action;
+					if (action === "release") {
+						// 一键发版
+						button_release(opts);
 					}
 
 					return;
@@ -159,6 +179,22 @@ async function overflow_revert(opts: any, version: string, message_id: string) {
 	fetchSync();
 
 	console.log("完成", version);
+}
+
+async function button_release(opts: any) {
+	const repo = fetchRepo(opts);
+	await repo.checkout("develop");
+	await repo.pull("origin", "develop");
+
+	await repo.checkout(`release/pro`);
+	await repo.merge([
+		"--no-ff",
+		"--no-edit",
+		"-m",
+		"merge: develop -> release/pro",
+	]);
+	const res = await repo.push("origin", `release/pro`);
+	fetchSync();
 }
 
 function fetchRepo(opts: { clonePath: string; repo: string }) {
