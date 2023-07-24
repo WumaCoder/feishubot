@@ -183,10 +183,8 @@ async function overflow_revert(opts: any, version: string, message_id: string) {
 
 async function button_release(opts: any) {
 	const repo = fetchRepo(opts);
-	await repo.checkout("develop");
-	await repo.pull("origin", "develop");
-
 	await repo.checkout(`release/pro`);
+	await repo.pull("origin", "release/pro");
 	await repo.merge([
 		"origin/develop",
 		"--no-ff",
