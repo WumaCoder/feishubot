@@ -167,7 +167,7 @@ function fetchRepo(opts: { clonePath: string; repo: string }) {
 	if (existsSync(join(cwd, ".git"))) {
 		return simpleGit(cwd);
 	} else {
-		return simpleGit(cwd).clone(opts.repo, cwd);
+		return simpleGit().clone(opts.repo, cwd);
 	}
 }
 
