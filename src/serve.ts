@@ -128,7 +128,37 @@ export default (program: Command) => {
 					const action = body.action.value.action;
 					if (action === "release") {
 						// 一键发版
-						button_release(opts);
+						button_release(opts)
+							.then(() => {
+								console.log("完成");
+								// 回复
+								client.im.message.create({
+									data: {
+										content: JSON.stringify({
+											text: `一键发版成功`,
+										}),
+										msg_type: "text",
+										receive_id: body.open_chat_id,
+									},
+									params: {
+										receive_id_type: "chat_id",
+									},
+								});
+							})
+							.catch((err) => {
+								client.im.message.create({
+									data: {
+										content: JSON.stringify({
+											text: `一键发版失败，失败原因: ${err}`,
+										}),
+										msg_type: "text",
+										receive_id: body.open_chat_id,
+									},
+									params: {
+										receive_id_type: "chat_id",
+									},
+								});
+							});
 					}
 
 					return;
