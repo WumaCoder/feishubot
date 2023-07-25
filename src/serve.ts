@@ -192,6 +192,9 @@ async function button_release(opts: any) {
 		"-m",
 		"merge: develop -> release/pro",
 	]);
+	await repo.commit("build: release version", [], {
+		"--allow-empty": true,
+	} as any);
 	const res = await repo.push("origin", `release/pro`);
 	fetchSync();
 }
