@@ -26,6 +26,7 @@ export default (program: Command) => {
 		.option(`--clone-path <string>`, `克隆到什么位置`, SERVE_REPO)
 		.description("飞书机器人后端服务")
 		.action(function (opts) {
+			let running = false;
 			fastify.post("/feishubot2", async (request, reply) => {
 				const body: any = request.body;
 				console.log(JSON.stringify(body));
@@ -33,6 +34,31 @@ export default (program: Command) => {
 				if (body.challenge) {
 					return body;
 				}
+
+				if (running) {
+					console.log("繁忙");
+					const receive_id =
+						body?.open_chat_id || body?.event?.message?.chat_id;
+					if (!receive_id) {
+						return;
+					}
+
+					client.im.message.create({
+						data: {
+							content: JSON.stringify({
+								text: `服务繁忙`,
+							}),
+							msg_type: "text",
+							receive_id,
+						},
+						params: {
+							receive_id_type: "chat_id",
+						},
+					});
+					return;
+				}
+
+				running = true;
 
 				await db.read();
 				const hook = body?.header?.event_type ?? body?.action?.tag;
@@ -77,6 +103,7 @@ export default (program: Command) => {
 						});
 
 						await db.write();
+						running = false;
 						return {
 							code: 0,
 						};
@@ -98,10 +125,12 @@ export default (program: Command) => {
 								receive_id_type: "chat_id",
 							},
 						});
+						running = false;
 						return {
 							code: 0,
 						};
 					} else {
+						running = false;
 						const msgOb = await client.im.message.create({
 							data: {
 								content: createParam("interactive", "ctp_AAqkUf5ZjWgh"),
@@ -123,6 +152,7 @@ export default (program: Command) => {
 						overflow_revert(opts, parseVersion(title), body.open_message_id);
 					}
 
+					running = false;
 					return;
 				} else if (hook === "button") {
 					const action = body.action.value.action;
@@ -132,6 +162,7 @@ export default (program: Command) => {
 							.then(() => {
 								console.log("完成");
 								// 回复
+								running = false;
 								client.im.message.create({
 									data: {
 										content: JSON.stringify({
@@ -146,10 +177,49 @@ export default (program: Command) => {
 								});
 							})
 							.catch((err) => {
+								running = false;
 								client.im.message.create({
 									data: {
 										content: JSON.stringify({
 											text: `一键发版失败，失败原因: ${err}`,
+										}),
+										msg_type: "text",
+										receive_id: body.open_chat_id,
+									},
+									params: {
+										receive_id_type: "chat_id",
+									},
+								});
+							});
+					}
+
+					if (action === "pre") {
+						// 一键发版
+						button_pre(opts, body.open_message_id)
+							.then(() => {
+								running = false;
+								console.log("完成");
+								// 回复
+								client.im.message.create({
+									data: {
+										content: JSON.stringify({
+											text: `生成二维码成功`,
+										}),
+										msg_type: "text",
+										receive_id: body.open_chat_id,
+									},
+									params: {
+										receive_id_type: "chat_id",
+									},
+								});
+							})
+							.catch((err) => {
+								running = false;
+
+								client.im.message.create({
+									data: {
+										content: JSON.stringify({
+											text: `生成二维码失败，失败原因: ${err}`,
 										}),
 										msg_type: "text",
 										receive_id: body.open_chat_id,
@@ -226,6 +296,24 @@ async function button_release(opts: any) {
 		"--allow-empty": true,
 	} as any);
 	const res = await repo.push("origin", `release/pro`);
+	fetchSync();
+}
+
+async function button_pre(opts: any, message_id: string) {
+	const repo = fetchRepo(opts);
+	await repo.checkout(`pre/develop`);
+	await repo.pull("origin", "pre/develop");
+	await repo.merge([
+		"origin/develop",
+		"--no-ff",
+		"--no-edit",
+		"-m",
+		"merge: develop -> pre/develop",
+	]);
+	await repo.commit(`build: pre ${message_id}`, [], {
+		"--allow-empty": true,
+	} as any);
+	const res = await repo.push("origin", `pre/develop`);
 	fetchSync();
 }
 

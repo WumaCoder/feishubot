@@ -57,10 +57,11 @@ export default (interactive: Command) => {
 					}
 
 					for (const chat of item.items) {
-						if (
-							chat.description?.includes("--console") &&
-							chat.description.includes("--disabled-push")
-						) {
+						if (chat.description?.includes("--disabled-push")) {
+							continue;
+						}
+
+						if (!chat.description?.includes(`--accept-${opts.template_id}`)) {
 							continue;
 						}
 
