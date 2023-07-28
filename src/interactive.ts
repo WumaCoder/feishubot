@@ -31,7 +31,7 @@ export default (interactive: Command) => {
 			opts.btns = parseBtns(opts.btns);
 			const msgIds = [];
 			if (opts.message_id) {
-				opts.message_id = opts.message_id.replace(/\n/g, "");
+				opts.message_id = opts.message_id.replace(/\s/g, "");
 			}
 
 			if (opts.message_id) {
