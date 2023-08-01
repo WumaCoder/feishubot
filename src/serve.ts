@@ -200,7 +200,7 @@ export default (program: Command) => {
 								(item: any) => item.feishuUserId === body.open_id,
 							) %
 								30) +
-							1;
+							2;
 						button_pre(opts, String(robot), body.open_id)
 							.then(() => {
 								running = false;
