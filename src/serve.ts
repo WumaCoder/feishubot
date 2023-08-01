@@ -240,6 +240,7 @@ export default (program: Command) => {
 					return;
 				}
 
+				running = false;
 				reply.send({ code: 0 });
 			});
 
