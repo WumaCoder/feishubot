@@ -166,7 +166,7 @@ export default (program: Command) => {
 								client.im.message.create({
 									data: {
 										content: JSON.stringify({
-											text: `<at user_id="${body.open_id}">TA</at> 一键发版成功`,
+											text: `<at user_id="${body.open_id}">TA</at> 请求一键发版成功`,
 										}),
 										msg_type: "text",
 										receive_id: body.open_chat_id,
@@ -181,7 +181,7 @@ export default (program: Command) => {
 								client.im.message.create({
 									data: {
 										content: JSON.stringify({
-											text: `<at user_id="${body.open_id}">TA</at> 一键发版失败，失败原因: ${err}`,
+											text: `<at user_id="${body.open_id}">TA</at> 请求一键发版失败，失败原因: ${err}`,
 										}),
 										msg_type: "text",
 										receive_id: body.open_chat_id,
@@ -209,7 +209,7 @@ export default (program: Command) => {
 								client.im.message.create({
 									data: {
 										content: JSON.stringify({
-											text: `<at user_id="${body.open_id}">TA</at> 生成二维码成功`,
+											text: `<at user_id="${body.open_id}">TA</at> 请求生成二维码成功`,
 										}),
 										msg_type: "text",
 										receive_id: body.open_chat_id,
@@ -225,7 +225,7 @@ export default (program: Command) => {
 								client.im.message.create({
 									data: {
 										content: JSON.stringify({
-											text: `<at user_id="${body.open_id}">TA</at> 生成二维码失败，失败原因: ${err}`,
+											text: `<at user_id="${body.open_id}">TA</at> 请求生成二维码失败，失败原因: ${err}`,
 										}),
 										msg_type: "text",
 										receive_id: body.open_chat_id,
