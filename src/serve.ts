@@ -166,7 +166,7 @@ export default (program: Command) => {
 								client.im.message.create({
 									data: {
 										content: JSON.stringify({
-											text: `一键发版成功`,
+											text: `<at user_id="${body.open_id}">TA</at> 一键发版成功`,
 										}),
 										msg_type: "text",
 										receive_id: body.open_chat_id,
@@ -181,7 +181,7 @@ export default (program: Command) => {
 								client.im.message.create({
 									data: {
 										content: JSON.stringify({
-											text: `一键发版失败，失败原因: ${err}`,
+											text: `<at user_id="${body.open_id}">TA</at> 一键发版失败，失败原因: ${err}`,
 										}),
 										msg_type: "text",
 										receive_id: body.open_chat_id,
@@ -194,8 +194,14 @@ export default (program: Command) => {
 					}
 
 					if (action === "pre") {
-						// 一键发版
-						button_pre(opts, body.open_message_id)
+						// 生成二维码
+						const robot =
+							(db.data.bindGitMembers.findIndex(
+								(item: any) => item.feishuUserId === body.open_id,
+							) %
+								30) +
+							1;
+						button_pre(opts, String(robot), body.open_id)
 							.then(() => {
 								running = false;
 								console.log("完成");
@@ -203,7 +209,7 @@ export default (program: Command) => {
 								client.im.message.create({
 									data: {
 										content: JSON.stringify({
-											text: `生成二维码成功`,
+											text: `<at user_id="${body.open_id}">TA</at> 生成二维码成功`,
 										}),
 										msg_type: "text",
 										receive_id: body.open_chat_id,
@@ -219,7 +225,7 @@ export default (program: Command) => {
 								client.im.message.create({
 									data: {
 										content: JSON.stringify({
-											text: `生成二维码失败，失败原因: ${err}`,
+											text: `<at user_id="${body.open_id}">TA</at> 生成二维码失败，失败原因: ${err}`,
 										}),
 										msg_type: "text",
 										receive_id: body.open_chat_id,
@@ -299,7 +305,7 @@ async function button_release(opts: any) {
 	fetchSync();
 }
 
-async function button_pre(opts: any, message_id: string) {
+async function button_pre(opts: any, robot: string, user_open_id: string) {
 	const repo = fetchRepo(opts);
 	await repo.checkout(`pre/develop`);
 	await repo.pull("origin", "pre/develop");
@@ -310,7 +316,7 @@ async function button_pre(opts: any, message_id: string) {
 		"-m",
 		"merge: develop -> pre/develop",
 	]);
-	await repo.commit(`build: pre ${message_id}`, [], {
+	await repo.commit(`build: robot=${robot}`, [], {
 		"--allow-empty": true,
 	} as any);
 	const res = await repo.push("origin", `pre/develop`);
