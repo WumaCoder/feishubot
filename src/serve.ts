@@ -307,6 +307,7 @@ async function button_release(opts: any) {
 
 async function button_pre(opts: any, robot: string, user_open_id: string) {
 	const repo = fetchRepo(opts);
+	await repo.fetch("origin", "develop");
 	await repo.checkout(`pre/develop`);
 	await repo.pull("origin", "pre/develop");
 	await repo.merge([
