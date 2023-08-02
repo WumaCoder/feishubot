@@ -1,6 +1,6 @@
 <h1 align="center">Feishubot</h1>
 
-<p align="center">a feishu bot</p>
+<p align="center">a feishu bot（目前是个人项目还不具备开源性质）</p>
 
 <p align="center">
 	<a href="#contributors" target="_blank">
@@ -29,13 +29,11 @@
 ## Usage
 
 ```shell
-npm i feishubot
+npm i feishubot2 -g
 ```
 
 ```ts
-import { greet } from "feishubot";
-
-greet("Hello, world!");
+feishubot2 interactive push --content "消息内容"
 ```
 
 ## Development
