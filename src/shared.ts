@@ -70,7 +70,7 @@ export function createParam(
 				template_variable,
 			},
 			type: "template",
-		});
+		}).replace("\\\\n", "\\n");
 	} else {
 		return JSON.stringify({
 			data: {

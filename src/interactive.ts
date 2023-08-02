@@ -126,9 +126,9 @@ export default (interactive: Command) => {
 
 		for (const msgId of tempJson.msgIds) {
 			await client.im.message.patch({
-				data: {
+				data: printObj({
 					content: await createContent(opts, opts.type),
-				},
+				}),
 				path: {
 					message_id: msgId,
 				},
@@ -156,3 +156,8 @@ export default (interactive: Command) => {
 			await CliDb.write();
 		});
 };
+
+function printObj(obj: any) {
+	console.log(JSON.stringify(obj));
+	return obj;
+}
