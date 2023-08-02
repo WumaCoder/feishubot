@@ -297,7 +297,7 @@ async function button_release(opts: any) {
 		"--no-ff",
 		"--no-edit",
 		"-m",
-		"merge: develop -> release/pro",
+		"chore: merge develop -> release/pro",
 	]);
 	await repo.commit("build: release version", [], {
 		"--allow-empty": true,
@@ -316,7 +316,7 @@ async function button_pre(opts: any, robot: string, user_open_id: string) {
 		"--no-ff",
 		"--no-edit",
 		"-m",
-		"merge: develop -> pre/develop",
+		"chore: merge develop -> pre/develop",
 	]);
 	await repo.commit(`build: robot=${robot}`, [], {
 		"--allow-empty": true,
