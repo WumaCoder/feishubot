@@ -110,7 +110,7 @@ export default (interactive: Command) => {
 		await CliDb.read();
 		const tempJson = CliDb.data.session[opts.id];
 		opts = Object.assign({}, tempJson.opts, opts);
-		console.log(opts, tempJson);
+		// console.log(opts, tempJson);
 		const status = opts?.status as "err" | "loading" | "none" | "ok" | "start";
 		if (opts.status === "loading") {
 			tempJson.loading++;
