@@ -220,7 +220,7 @@ export default (program: Command) => {
 								30) +
 							3;
 						const formParam =
-							db.data.msgMap[body.open_message_id + "_" + body.open_id];
+							db.data.msgMap[body.open_message_id + "_" + body.open_id] ?? {};
 						button_pre(
 							opts,
 							String(robot),
