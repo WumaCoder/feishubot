@@ -394,9 +394,12 @@ async function button_pre(
 		await repo.checkoutBranch(preBranchName, originBranchName);
 	}
 
-	console.log("[button_pre]", "pull origin", preBranchName);
-	await repo.pull("origin", preBranchName);
-	console.log("[button_pre]", "merge origin", [
+	try {
+		console.log("[button_pre]", "pull origin", preBranchName);
+		await repo.pull("origin", preBranchName);
+	} catch (err) {}
+
+	console.log("[button_pre]", "merge", [
 		originBranchName,
 		"--no-ff",
 		"--no-edit",
