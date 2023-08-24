@@ -219,7 +219,8 @@ export default (program: Command) => {
 							) %
 								30) +
 							3;
-						const formParam = db.data.msgMap[body.open_message_id];
+						const formParam =
+							db.data.msgMap[body.open_message_id + "_" + body.open_id];
 						button_pre(
 							opts,
 							String(robot),
@@ -264,7 +265,9 @@ export default (program: Command) => {
 					if (action === "dev") {
 						// 生成二维码
 						console.log("dev");
-						console.log(db.data.msgMap[body.open_message_id]);
+						console.log(
+							db.data.msgMap[body.open_message_id + "_" + body.open_id],
+						);
 						running = false;
 					}
 
@@ -278,13 +281,14 @@ export default (program: Command) => {
 							db.data.msgMap = {};
 						}
 
-						db.data.msgMap[body.open_message_id] = Object.assign(
-							{},
-							db.data.msgMap[body.open_message_id],
-							{
-								[param.key]: body.action.option,
-							},
-						);
+						db.data.msgMap[body.open_message_id + "_" + body.open_id] =
+							Object.assign(
+								{},
+								db.data.msgMap[body.open_message_id + "_" + body.open_id],
+								{
+									[param.key]: body.action.option,
+								},
+							);
 						await db.write();
 					}
 
