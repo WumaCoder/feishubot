@@ -377,6 +377,7 @@ async function button_pre(
 	}
 
 	const preBranchName = `pre/${branch.replace(/\//g, "-")}`;
+	const originBranchName = `origin/${branch}`;
 
 	console.log("[button_pre]", "fetch", branch, envServer, preBranchName);
 	await repo.fetch("origin", branch);
@@ -384,21 +385,26 @@ async function button_pre(
 		console.log("[button_pre]", "checkout", preBranchName);
 		await repo.checkout(preBranchName);
 	} catch (error) {
-		console.log("[button_pre]", "checkoutBranch", preBranchName);
-		await repo.checkoutBranch(preBranchName, branch);
+		console.log(
+			"[button_pre]",
+			"checkoutBranch",
+			preBranchName,
+			originBranchName,
+		);
+		await repo.checkoutBranch(preBranchName, originBranchName);
 	}
 
 	console.log("[button_pre]", "pull origin", preBranchName);
 	await repo.pull("origin", preBranchName);
 	console.log("[button_pre]", "merge origin", [
-		`origin/${branch}`,
+		originBranchName,
 		"--no-ff",
 		"--no-edit",
 		"-m",
 		`chore: merge ${branch} -> ${preBranchName}`,
 	]);
 	await repo.merge([
-		`origin/${branch}`,
+		originBranchName,
 		"--no-ff",
 		"--no-edit",
 		"-m",
