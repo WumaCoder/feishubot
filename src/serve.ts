@@ -131,9 +131,27 @@ export default (program: Command) => {
 						};
 					} else {
 						running = false;
+						const branchIds = await getBranchNames(opts);
 						const msgOb = await client.im.message.create({
 							data: {
-								content: createParam("interactive", "ctp_AAqkUf5ZjWgh"),
+								content: createParam("interactive", "ctp_AAqkUf5ZjWgh", {
+									branchs: branchIds
+										.filter(
+											(item) =>
+												!item.startsWith("pre/") &&
+												!item.startsWith("release/"),
+										)
+										.map((item: string) => ({
+											text: item,
+											value: item,
+										})),
+									// [
+									// 	{
+									// 		text: "develop",
+									// 		value: 'develop',
+									// 	}
+									// ]
+								}),
 								msg_type: "interactive",
 								receive_id: body.event.message.chat_id!,
 							},
@@ -201,7 +219,13 @@ export default (program: Command) => {
 							) %
 								30) +
 							3;
-						button_pre(opts, String(robot), body.open_id)
+						const formParam = db.data.msgMap[body.open_message_id];
+						button_pre(
+							opts,
+							String(robot),
+							formParam.branch,
+							formParam.envServer,
+						)
 							.then(() => {
 								running = false;
 								console.log("完成");
@@ -221,7 +245,7 @@ export default (program: Command) => {
 							})
 							.catch((err) => {
 								running = false;
-
+								console.error(err);
 								client.im.message.create({
 									data: {
 										content: JSON.stringify({
@@ -235,6 +259,33 @@ export default (program: Command) => {
 									},
 								});
 							});
+					}
+
+					if (action === "dev") {
+						// 生成二维码
+						console.log("dev");
+						console.log(db.data.msgMap[body.open_message_id]);
+						running = false;
+					}
+
+					return;
+				} else if (hook === "select_static") {
+					running = false;
+					const param = body.action.value;
+
+					if (param.action === "form") {
+						if (!db.data.msgMap) {
+							db.data.msgMap = {};
+						}
+
+						db.data.msgMap[body.open_message_id] = Object.assign(
+							{},
+							db.data.msgMap[body.open_message_id],
+							{
+								[param.key]: body.action.option,
+							},
+						);
+						await db.write();
 					}
 
 					return;
@@ -306,22 +357,64 @@ async function button_release(opts: any) {
 	fetchSync();
 }
 
-async function button_pre(opts: any, robot: string, user_open_id: string) {
+async function button_pre(
+	opts: any,
+	robot: string,
+	branch: string,
+	envServer: string,
+) {
 	const repo = fetchRepo(opts);
-	await repo.fetch("origin", "develop");
-	await repo.checkout(`pre/develop`);
-	await repo.pull("origin", "pre/develop");
-	await repo.merge([
-		"origin/develop",
+	if (!branch) {
+		branch = "develop";
+	}
+
+	if (!envServer) {
+		envServer = "production";
+	}
+
+	const preBranchName = `pre/${branch.replace(/\//g, "-")}`;
+
+	console.log("[button_pre]", "fetch", branch, envServer, preBranchName);
+	await repo.fetch("origin", branch);
+	try {
+		console.log("[button_pre]", "checkout", preBranchName);
+		await repo.checkout(preBranchName);
+	} catch (error) {
+		console.log("[button_pre]", "checkoutBranch", preBranchName);
+		await repo.checkoutBranch(preBranchName, branch);
+	}
+
+	console.log("[button_pre]", "pull origin", preBranchName);
+	await repo.pull("origin", preBranchName);
+	console.log("[button_pre]", "merge origin", [
+		`origin/${branch}`,
 		"--no-ff",
 		"--no-edit",
 		"-m",
-		"chore: merge develop -> pre/develop",
+		`chore: merge ${branch} -> ${preBranchName}`,
 	]);
-	await repo.commit(`build: robot=${robot}`, [], {
-		"--allow-empty": true,
-	} as any);
-	const res = await repo.push("origin", `pre/develop`);
+	await repo.merge([
+		`origin/${branch}`,
+		"--no-ff",
+		"--no-edit",
+		"-m",
+		`chore: merge ${branch} -> ${preBranchName}`,
+	]);
+	console.log(
+		"[button_pre]",
+		"commit",
+		`build: robot=${robot},branch=${branch},envServer=${envServer}`,
+	);
+	await repo.commit(
+		`build: robot=${robot},branch=${branch},envServer=${envServer}`,
+		[],
+		{
+			"--allow-empty": true,
+		} as any,
+	);
+	console.log("[button_pre]", "push", "origin", preBranchName);
+	const res = await repo.push("origin", preBranchName);
+	console.log("[button_pre]", "fetchSync");
 	fetchSync();
 }
 
@@ -348,4 +441,15 @@ function fetchSync() {
 		"-r",
 		repo,
 	]);
+}
+
+async function getBranchNames(opts: any) {
+	// 获取最新远程分支名
+	const repo = fetchRepo(opts);
+	await repo.fetch("origin");
+	const res = await repo.branch(["-r"]);
+	const branchIds = res.all
+		.filter((item: string) => !item.startsWith("origin/HEAD"))
+		.map((item: string) => item.replace("origin/", ""));
+	return branchIds;
 }

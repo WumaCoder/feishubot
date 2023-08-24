@@ -26,6 +26,7 @@
 	],
 	"scripts": {
 		"build": "tsc",
+		"dev": "tsc && node ./lib/index.js",
 		"format": "prettier \"**/*\" --ignore-unknown",
 		"format:write": "pnpm format --write",
 		"lint": "eslint . .*js --max-warnings 0 --report-unused-disable-directives",

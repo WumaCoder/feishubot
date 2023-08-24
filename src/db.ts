@@ -8,6 +8,7 @@ export class ServeDbData {
 		feishuUserId: string;
 		gitEmail: string;
 	}[] = [];
+	msgMap: Record<string, { branch: string; envServer: string }> = {};
 }
 export const ServeDb = new Low(
 	new JSONFile<ServeDbData>(SERVE_DB_FILE),
